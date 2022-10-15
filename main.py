@@ -43,8 +43,7 @@ def main() -> None:
         new_pre_game_stats = pre_game_stats.print_stats_overall("Today's players")
         print("Loading Game day statistics.")
         day_is_finished = game_day_stats.create_game_day_stats("Game day statistics")
-
-
+      
         for file_name in files:
             print(f"Sending email: {file_name}")
             send_stats(file_name)
