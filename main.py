@@ -43,13 +43,18 @@ def main() -> None:
         new_pre_game_stats = pre_game_stats.print_stats_overall("Today's players")
         print("Loading Game day statistics.")
         day_is_finished = game_day_stats.create_game_day_stats("Game day statistics")
-      
+        if not day_is_finished:
+            files.remove("Game day statistics")
+
+        if not new_pre_game_stats:
+            files.remove("Today's players")
+
         for file_name in files:
             print(f"Sending email: {file_name}")
             send_stats(file_name)
 
         print("Sleeping...")
-        time.sleep(60)
+        time.sleep(10 * 60)
 
 
 # Press the green button in the gutter to run the script.
