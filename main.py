@@ -9,6 +9,7 @@ import ssl
 
 #  #########################
 #  ## NHLstatsFORlearning ##
+#  ## NHLstatsFORlearning1<#
 #  #########################
 
 def send_stats(filename: str):
