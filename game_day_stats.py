@@ -37,7 +37,7 @@ def create_game_day_stats(filename: str) -> bool:
     :return: True if all games of today are finished
              False otherwise or not changes were made
     """
-    game_day = datetime.today() - timedelta(days=1, hours=00, minutes=00)
+    game_day = datetime.today() - timedelta(days=00, hours=00, minutes=00)
     game_day = game_day.strftime("%Y-%m-%d")
 
     finished_games = get_finished_games_id(game_day)

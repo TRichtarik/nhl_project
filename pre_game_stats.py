@@ -30,7 +30,7 @@ def print_stats_overall(filename: str) -> bool:
              False otherwise
     """
 
-    game_day = datetime.today() - timedelta(days=1, hours=00, minutes=00)
+    game_day = datetime.today() - timedelta(days=00, hours=00, minutes=00)
     game_day = game_day.strftime("%Y-%m-%d")
 
     game_ids = get_today_game_id(game_day)
