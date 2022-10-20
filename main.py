@@ -1,10 +1,12 @@
-import time
-import pre_game_stats
-import game_day_stats
-from datetime import datetime
-from typing import List
 import smtplib
 import ssl
+import pandas
+import time
+from datetime import datetime
+from email.message import EmailMessage
+
+import game_day_stats
+import pre_game_stats
 
 
 #  #########################
@@ -12,26 +14,38 @@ import ssl
 #  ## NHLstatsFORlearning1<#
 #  #########################
 
-def send_stats(filename: str):
+def send_upgrade(filename: str):
+    msg = EmailMessage()
+    msg['Subject'] = 'This is my first Python email'
+    msg['From'] = "nhl.statistiky@gmail.com"
+    msg['To'] = "nhl.statistiky@gmail.com"
+    with open(filename) as visual:
+        msg.set_content(visual.read(), subtype='html')
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+        smtp.login("nhl.statistiky@gmail.com", "hdohjcyfcgltxcud")
+        smtp.send_message(msg)
+
+
+def send_stats(subject: str, filename: str):
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
 
-    sender_email = "nhl.statistiky@gmail.com"  # Enter your address
+    msg = EmailMessage()
+    msg['Subject'] = f'{subject}'
+    msg['From'] = "nhl.statistiky@gmail.com"
+    msg['To'] = "nhl.statistiky@gmail.com"
+
     password = "hdohjcyfcgltxcud"
 
-    receiver_email_mine = "richtom21@gmail.com"  # Enter receiver address
-    receiver_email_love = "martina.paliarikova@gmail.com"
-
-    message = f"Subject: {filename}\n"
     with open(filename, 'r') as fp:
-        message += fp.read()
+        msg.set_content(fp.read().encode('ascii', 'ignore').decode('ascii'), subtype='html')
 
-    message = message.encode('ascii', 'ignore').decode('ascii')
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email_mine, message)
-        # server.sendmail(sender_email, receiver_email_love, message)
+        server.login(msg['From'], password)
+        server.send_message(msg)
 
 
 def main() -> None:
@@ -51,8 +65,11 @@ def main() -> None:
             files.remove("Today's players")
 
         for file_name in files:
+            csv_file = pandas.read_csv(file_name)
+            html_file = f"{file_name}_html"
+            csv_file.to_html(html_file)
             print(f"Sending email: {file_name}")
-            send_stats(file_name)
+            send_stats(f"{file_name}", html_file)
 
         print("Sleeping...")
         time.sleep(10 * 60)
