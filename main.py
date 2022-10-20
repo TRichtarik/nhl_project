@@ -2,6 +2,7 @@ import smtplib
 import ssl
 import pandas
 import time
+import os
 from datetime import datetime
 from email.message import EmailMessage
 
@@ -14,20 +15,6 @@ import pre_game_stats
 #  ## NHLstatsFORlearning1<#
 #  #########################
 
-def send_upgrade(filename: str):
-    msg = EmailMessage()
-    msg['Subject'] = 'This is my first Python email'
-    msg['From'] = "nhl.statistiky@gmail.com"
-    msg['To'] = "nhl.statistiky@gmail.com"
-    with open(filename) as visual:
-        msg.set_content(visual.read(), subtype='html')
-
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
-        smtp.login("nhl.statistiky@gmail.com", "hdohjcyfcgltxcud")
-        smtp.send_message(msg)
-
-
 def send_stats(subject: str, filename: str):
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
@@ -35,7 +22,7 @@ def send_stats(subject: str, filename: str):
     msg = EmailMessage()
     msg['Subject'] = f'{subject}'
     msg['From'] = "nhl.statistiky@gmail.com"
-    msg['To'] = "nhl.statistiky@gmail.com"
+    msg['To'] = "richtom21@gmail.com"
 
     password = "hdohjcyfcgltxcud"
 
@@ -70,6 +57,7 @@ def main() -> None:
             csv_file.to_html(html_file)
             print(f"Sending email: {file_name}")
             send_stats(f"{file_name}", html_file)
+            os.remove(html_file)
 
         print("Sleeping...")
         time.sleep(10 * 60)

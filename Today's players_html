@@ -7,35 +7,5 @@
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <th>0</th>
-      <td>Anaheim Ducks</td>
-      <td>Pavol Regenda</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Montréal Canadiens</td>
-      <td>Juraj Slafkovsky</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>New York Rangers</td>
-      <td>Jaroslav Halak</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Washington Capitals</td>
-      <td>Martin Fehervary</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>New Jersey Devils</td>
-      <td>Tomas Tatar</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>Calgary Flames</td>
-      <td>Adam Ruzicka</td>
-    </tr>
   </tbody>
 </table>
