@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 STATISTICS_HEADER = {"Game day statistics.csv": ['full_name', 'goals', 'assists', 'plus_minus'],
                      "Today's players.csv": ['team_name', 'full_name']}
 
-Response: requests.models.Response
+Response = requests.models.Response
 
 
 class Player:

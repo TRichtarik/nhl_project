@@ -3,7 +3,7 @@ import ssl
 import pandas
 import time
 import os
-from python_bot import stats
+import stats
 from email.message import EmailMessage
 
 
@@ -19,7 +19,7 @@ def send_stats(subject: str, filename_http: str) -> None:
     msg = EmailMessage()
     msg['Subject'] = f'{subject}'
     msg['From'] = "nhl.statistiky@gmail.com"
-    msg['To'] = ["richtom21@gmail.com", "martina.paliarikova@gmail.com"]
+    msg['To'] = "richtom21@gmail.com"
     password = "hdohjcyfcgltxcud"
 
     with open(filename_http, 'r') as fp:
