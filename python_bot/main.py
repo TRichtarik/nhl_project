@@ -74,7 +74,7 @@ def main() -> None:
     statistics = {"Game day statistics.csv": ("", False, stats.update_stats),
                   "Today's players.csv": ("", False, stats.update_stats)}
 
-    dir_name = "phyton_bot"
+    dir_name = "pyton_bot"
     dir_path = get_stats_dir_path(dir_name)
     temp_file_path = get_stats_file_path(dir_path, "temp_file")
     games = stats.Games()
