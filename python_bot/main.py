@@ -42,8 +42,7 @@ def get_stats_dir_path(dir_name: str) -> str:
     parent_dir = os.path.dirname(os.getcwd())
     path = os.path.join(parent_dir, dir_name)
 
-    if not os.path.exists(path):
-        os.mkdir(path)
+   
 
     return path
 
