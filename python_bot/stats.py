@@ -44,7 +44,7 @@ class Games:
         return self.today_in_progress
 
     def get_time(self) -> str:
-        day = 1
+        day = 0
 
         if not self.today_in_progress:
             day = 0
