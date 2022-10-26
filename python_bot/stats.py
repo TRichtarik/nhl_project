@@ -38,18 +38,14 @@ class Games:
         self.today_ended: Set[str] = set()
 
     def get_game_ids(self, file_name: str) -> Set[str]:
-
         if file_name == "Game day statistics.csv":
             return self.today_ended
         return self.today_in_progress
 
     def get_time(self) -> str:
-        day = 0
+        os.environ['TZ'] = 'US/Eastern'
 
-        if not self.today_in_progress:
-            day = 0
-
-        game_day = datetime.today() - timedelta(days=day, hours=00, minutes=00)
+        game_day = datetime.today() - timedelta(days=1, hours=00, minutes=00)
         game_day = game_day.strftime("%Y-%m-%d")
         return game_day
 
@@ -69,8 +65,8 @@ def fill_game_ids(games: Games) -> None:
             # Finished codes = {5,6,7}
             if game["status"]["statusCode"] in {"5", "6", "7"}:
                 games.today_ended.add(game["gamePk"])
-            elif game["status"]["statusCode"] not in {"1", "8", "9"}:
-                games.today_in_progress.add(game["gamePk"])
+
+            games.today_in_progress.add(game["gamePk"])
 
 
 def update_stats(games: Games, file_name: str, file_path: str, temp_file: str) -> bool:

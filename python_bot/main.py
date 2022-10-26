@@ -81,11 +81,6 @@ def main() -> None:
 
     while True:
 
-        if games.today_in_progress == games.today_games_counter:
-            games.today_in_progress = set()
-
-        games.today_ended = set()
-
         stats.fill_game_ids(games)
 
         for file_name, (_, is_updated, function) in statistics.items():
@@ -105,6 +100,9 @@ def main() -> None:
             send_stats(f"{file_name}", html_file)
             os.remove(html_file)
             statistics[file_name] = (file_path, False, function)
+
+        if games.today_ended == games.today_games_counter:
+            games = stats.Games()
 
         print("Sleeping...")
         time.sleep(10 * 60)
