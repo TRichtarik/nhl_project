@@ -65,8 +65,8 @@ def fill_game_ids(games: Games) -> None:
             # Finished codes = {5,6,7}
             if game["status"]["statusCode"] in {"5", "6", "7"}:
                 games.today_ended.add(game["gamePk"])
-
-            games.today_in_progress.add(game["gamePk"])
+            if games.today_in_progress != {}:
+                games.today_in_progress.add(game["gamePk"])
 
 
 def update_stats(games: Games, file_name: str, file_path: str, temp_file: str) -> bool:
