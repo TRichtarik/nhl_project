@@ -101,7 +101,7 @@ def main() -> None:
             os.remove(html_file)
             statistics[file_name] = (file_path, False, function)
 
-        if games.today_ended == games.today_games_counter:
+        if len(games.today_ended) == games.today_games_counter:
             games = stats.Games()
 
         print("Sleeping...")
