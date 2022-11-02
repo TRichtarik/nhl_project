@@ -65,7 +65,7 @@ def fill_game_ids(games: Games) -> None:
             # Finished codes = {5,6,7}
             if game["status"]["statusCode"] in {"5", "6", "7"}:
                 games.today_ended.add(game["gamePk"])
-            if games.today_in_progress != {}:
+            else:
                 games.today_in_progress.add(game["gamePk"])
 
 
