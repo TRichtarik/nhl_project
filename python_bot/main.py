@@ -1,35 +1,14 @@
-import smtplib
-import ssl
+import mail_comunication
 import pandas
 import time
 import os
 import stats
-from email.message import EmailMessage
 
 
 #  #########################
 #  ## NHLstatsFORlearning ##
 #  ## NHLstatsFORlearning1<#
 #  #########################
-
-def send_stats(subject: str, filename_http: str) -> None:
-    port = 465  # For SSL
-    smtp_server = "smtp.gmail.com"
-
-    msg = EmailMessage()
-    msg['Subject'] = f'{subject}'
-    msg['From'] = "nhl.statistiky@gmail.com"
-    msg['To'] = ["richtom21@gmail.com", "martina.paliarikova@gmail.com"]
-    password = "hdohjcyfcgltxcud"
-
-    with open(filename_http, 'r') as fp:
-        message = fp.read().encode('ascii', 'ignore').decode('ascii')
-        msg.set_content(message, subtype='html')
-
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(msg['From'], password)
-        server.send_message(msg)
 
 
 def get_stats_dir_path(dir_name: str) -> str:
@@ -50,6 +29,7 @@ def get_stats_dir_path(dir_name: str) -> str:
 
 def get_stats_file_path(dir_path: str, file_name: str) -> str:
     """
+    popis
     :param dir_path: Directory where statistics are stored.
     :param file_name: Specific statistic name.
     :return: Path to specific file. If file does not exist, we create one.
@@ -63,49 +43,55 @@ def get_stats_file_path(dir_path: str, file_name: str) -> str:
     return file_path
 
 
-def main() -> None:
-    """
-    Loads all different statistics into text file named after statistic.
-    Notifies user via email if changes in statistic happens.
-    :return:
-    """
+def create_html_table(file_name: str):
+    csv_file = pandas.read_csv(file_name)
+    html_file = f"{file_name}_html"
+    csv_file.to_html(html_file)
+    return html_file
 
+
+
+def process_request():
     # name of stat: (path to stat_file, is updated, function to update stat)
-    statistics = {"Game day statistics.csv": ("", False, stats.update_stats),
-                  "Today's players.csv": ("", False, stats.update_stats)}
 
-    dir_name = "csv_statistics"
-    dir_path = get_stats_dir_path(dir_name)
-    temp_file_path = get_stats_file_path(dir_path, "temp_file")
-    games = stats.Games()
+    # help
+    # {day=format} / {month=format} - {player=list them} / {player=nationality list} / {team=list them}
+    #                                                       - {all_s, all_m, all_l /goals-points-plusminus}
+    # -date/game day format
+    # -date/today players format
+    # -month player/players stats
+    # -month team stats
+    # "Today's players.csv": ("", False, stats.update_stats)
+
+    options = {'help': stats.print_help,
+               'game day': stats.game_day}
+    file_name = 'temp'
 
     while True:
+        mails = mail_comunication.read_email()
 
-        stats.fill_game_ids(games)
+        for mail in mails:
+            if mail['Subject'] not in options.keys():
+                function = options['help']
+            else:
+                function = options[mail['Subject']]
 
-        for file_name, (_, is_updated, function) in statistics.items():
-            print(f"Loading {file_name}")
-            file_path = get_stats_file_path(dir_path, file_name)
-            is_updated = function(games, file_name, file_path, temp_file_path)
-            statistics[file_name] = (file_path, is_updated, function)
+            function(file_name)
 
-        for file_name, (file_path, is_updated, function) in statistics.items():
-            if not is_updated:
-                continue
+            file_name = create_html_table(file_name)
 
-            csv_file = pandas.read_csv(file_path)
-            html_file = f"{file_name}_html"
-            csv_file.to_html(html_file)
-            print(f"Sending email: {file_name}")
-            send_stats(f"{file_name}", html_file)
-            os.remove(html_file)
-            statistics[file_name] = (file_path, False, function)
+            print(f"Sending email : {mail['Subject']} to {mail['From']}")
 
-        if len(games.today_ended) == games.today_games_counter:
-            games = stats.Games()
+            mail_comunication.send_stats(mail['Subject'], file_name, mail['From'])
+            os.remove(file_name)
 
-        print("Sleeping...")
-        time.sleep(10 * 60)
+
+        print('Sleeping...')
+        time.sleep(10)
+
+
+def main() -> None:
+    process_request()
 
 
 # Press the green button in the gutter to run the script.

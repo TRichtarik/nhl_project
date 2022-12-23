@@ -1,14 +1,15 @@
 import requests
 import csv
 import os
-from filecmp import cmp
 from typing import List, Set
 from datetime import datetime, timedelta
 
-STATISTICS_HEADER = {"Game day statistics.csv": ['full_name', 'goals', 'assists', 'plus_minus'],
+import mail_comunication
+
+STATISTICS_HEADER = {"game day": ['full_name', 'goals', 'assists', 'plus_minus'],
                      "Today's players.csv": ['team_name', 'full_name']}
 
-Response = requests.models.Response
+Response = requests.models.Response.json
 
 
 class Player:
@@ -38,7 +39,7 @@ class Games:
         self.today_ended: Set[str] = set()
 
     def get_game_ids(self, file_name: str) -> Set[str]:
-        if file_name == "Game day statistics.csv":
+        if file_name == "game day":
             return self.today_ended
         return self.today_in_progress
 
@@ -48,6 +49,29 @@ class Games:
         game_day = datetime.today() - timedelta(days=1, hours=00, minutes=00)
         game_day = game_day.strftime("%Y-%m-%d")
         return game_day
+
+
+def print_help(file_name: str):
+    helper = """--- Welcome to nhl via mail stats ---\n
+    --- TYPE --- FUNCTIONALITY --- \n
+    Currently implemented stats:\n
+    ------------------------------------\n
+    Will be implemented soon:\n
+    -------------------------------------\n
+    How to use:\n
+    Simply by just typing stats type in SUBJECT of email'\n
+    send to address nhl.statistiky@gmail.com') \n
+    Recognition of stat type is case and syntax sensitive!\n
+    -------------------------------------\n"""
+
+    with open(file_name, 'w') as temp_file:
+        temp_file.write(helper)
+
+
+def game_day(file_name: str):
+    games = Games()
+    fill_game_ids(games)
+    update_stats(games, file_name, 'game day')
 
 
 def fill_game_ids(games: Games) -> None:
@@ -69,12 +93,9 @@ def fill_game_ids(games: Games) -> None:
                 games.today_in_progress.add(game["gamePk"])
 
 
-def update_stats(games: Games, file_name: str, file_path: str, temp_file: str) -> bool:
-    if not games.get_game_ids(file_name):
-        return False
-
+def update_stats(games: Games, temp_file: str, stat_type: str) -> bool:
     players: List[Player] = []
-    for game_id in games.get_game_ids(file_name):
+    for game_id in games.get_game_ids(stat_type):
         url = f"https://statsapi.web.nhl.com/api/v1/game/{game_id}/boxscore"
         response = requests.get(url)
         if response.status_code != 200:
@@ -86,7 +107,7 @@ def update_stats(games: Games, file_name: str, file_path: str, temp_file: str) -
     if not players:
         return False
 
-    return write_statistics_to_file(file_name, file_path, temp_file, players)
+    return write_statistics_to_file(stat_type, temp_file, players)
 
 
 def load_roaster(response: Response, players: List[Player]) -> bool:
@@ -101,21 +122,15 @@ def load_roaster(response: Response, players: List[Player]) -> bool:
     return True
 
 
-def write_statistics_to_file(file_name: str, file_path: str, temp_file: str, players: List[Player]) -> bool:
+def write_statistics_to_file(stat_type, temp_file: str, players: List[Player]) -> bool:
     rows = []
 
     for player in players:
-        rows.append(dict((attribute, getattr(player, f"{attribute}")) for attribute in STATISTICS_HEADER[file_name]))
+        rows.append(dict((attribute, getattr(player, f"{attribute}")) for attribute in STATISTICS_HEADER[stat_type]))
 
     with open(temp_file, 'w', encoding='UTF8', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=STATISTICS_HEADER[file_name])
+        writer = csv.DictWriter(f, fieldnames=STATISTICS_HEADER[stat_type])
         writer.writeheader()
         writer.writerows(rows)
 
-    if not cmp(temp_file, file_path):
-        os.remove(file_path)
-        os.renames(temp_file, file_path)
-        return True
-
-    os.remove(temp_file)
-    return False
+    return True
